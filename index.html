@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - Jogo da Forca</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <link rel="stylesheet" href="css/login.css" />
+    <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
+  </head>
+  <body>
+    <div class="container">
+      <img src="img/forca.png" alt="" />
+      <h1 class="mt-5">TELA DE LOGIN</h1>
+      <form id="loginForm">
+        <div class="form-group">
+          <input
+            type="text"
+            id="username"
+            class="form-control"
+            placeholder="Username"
+            required
+          />
+        </div>
+        <button type="submit" class="btn btn-primary">PLAY</button>
+      </form>
+      <div id="feedback" class="mt-3"></div>
+    </div>
+
+    <script>
+      const nomeUsuario = localStorage.getItem("nomeUsuario");
+      if (nomeUsuario) {
+        window.location.href = "jogo.html";
+      }
+
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+          const username = document.getElementById("username").value.trim();
+
+          if (!username) {
+            alert("Por favor, insira um nome.");
+            return;
+          }
+
+          fetch("http://localhost:3000/cadastrar", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ nome: username }),
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error("Erro ao cadastrar usuário");
+              }
+              return response.text();
+            })
+            .then((message) => {
+              console.log(message);
+              localStorage.setItem("nomeUsuario", username);
+              window.location.href = "jogo.html";
+            })
+            .catch((error) => {
+              console.error(error);
+              alert("Erro ao cadastrar usuário. Tente novamente.");
+            });
+        });
+    </script>
+  </body>
+</html>

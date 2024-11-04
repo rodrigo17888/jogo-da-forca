@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ranking - Jogo da Forca</title>
+    <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+      integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    />
+    <link rel="stylesheet" href="css/ranking.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="mt-4 mb-4">
+        <i class="fa-solid fa-star"></i> - Ranking -
+        <i class="fa-solid fa-star"></i>
+      </h1>
+
+      <div id="loading" class="alert alert-info" style="display: none">
+        Carregando ranking...
+      </div>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Posição</th>
+            <th>Nome</th>
+            <th>Pontuação</th>
+          </tr>
+        </thead>
+        <tbody id="ranking-table"></tbody>
+      </table>
+      <button onclick="window.history.back()" class="btn btn-secondary mb-3">
+        Voltar
+      </button>
+      <div id="meuRanking" class="mt-3"></div>
+    </div>
+
+    <script>
+      async function carregarRanking() {
+        const loadingIndicator = document.getElementById("loading");
+        loadingIndicator.style.display = "block";
+
+        try {
+          const response = await fetch("http://localhost:3000/ranking");
+
+          if (!response.ok) {
+            throw new Error(`Erro ao buscar dados: ${response.statusText}`);
+          }
+
+          const ranking = await response.json();
+          const rankingTable = document.getElementById("ranking-table");
+          rankingTable.innerHTML = "";
+
+          ranking.forEach((usuario, index) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${usuario.nome}</td>
+                        <td>${usuario.pontuacao}</td>
+                    `;
+            rankingTable.appendChild(row);
+          });
+
+          const nomeUsuario = localStorage.getItem("nomeUsuario");
+          const meuRankingDiv = document.getElementById("meuRanking");
+          const meuUsuario = ranking.find((user) => user.nome === nomeUsuario);
+          if (meuUsuario) {
+            meuRankingDiv.innerHTML = `<strong>Você está na posição: ${
+              ranking.indexOf(meuUsuario) + 1
+            } com ${meuUsuario.pontuacao} pontos!</strong>`;
+          } else {
+            meuRankingDiv.innerHTML =
+              "<strong>Você ainda não tem pontuação registrada.</strong>";
+          }
+        } catch (error) {
+          console.error("Erro ao carregar ranking:", error);
+          alert(
+            "Não foi possível carregar o ranking. Tente novamente mais tarde."
+          );
+        } finally {
+          loadingIndicator.style.display = "none";
+        }
+      }
+
+      window.onload = carregarRanking;
+    </script>
+  </body>
+</html>
