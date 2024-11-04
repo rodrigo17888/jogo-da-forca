@@ -1,0 +1,29 @@
+# Ignora node_modules
+node_modules/
+
+# Ignora variáveis de ambiente
+.env
+
+# Ignora arquivos de log
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Ignora banco de dados SQLite (caso esteja usando)
+*.sqlite
+*.sqlite3
+
+# Ignora arquivos de cache
+.cache/
+.next/
+.nuxt/
+
+# Ignora o diretório de build (se houver)
+dist/
+build/
+
+# Ignora arquivos de sistema
+.DS_Store
+Thumbs.db
