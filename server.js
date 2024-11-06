@@ -1,28 +1,31 @@
+require("dotenv").config();
+
 const express = require("express");
 const mysql = require("mysql2");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors()); // Permite requisições de outros domínios
-app.use(bodyParser.json()); // Middleware para ler JSON
+app.use(cors());
+app.use(bodyParser.json());
 
-// Configuração da conexão com o banco de dados MySQL
+// Configuração da conexão com o banco de dados MySQL usando variáveis de ambiente
 const db = mysql.createConnection({
-  host: "localhost", // Altere para o seu host
-  user: "root", // Altere para o seu usuário do MySQL
-  password: "rodrigolopes", // Altere para a sua senha do MySQL
-  database: "jogo_forca", // Altere para o seu banco de dados
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  port: process.env.DB_PORT,
 });
 
 // Conectar ao banco de dados
 db.connect((err) => {
   if (err) {
     console.error("Erro ao conectar ao banco de dados:", err);
-    process.exit(1); // Encerra o processo se a conexão falhar
+    process.exit(1);
   }
   console.log("Conectado ao banco de dados!");
 });
@@ -36,13 +39,12 @@ app.listen(PORT, () => {
 app.post("/cadastrar", (req, res) => {
   const { nome } = req.body;
 
-  console.log("Cadastro recebido:", req.body); // Verifique os dados recebidos
+  console.log("Cadastro recebido:", req.body);
 
   if (!nome) {
     return res.status(400).send("Nome é obrigatório");
   }
 
-  // Verifica se o usuário já existe
   const checkUserQuery = "SELECT * FROM usuarios WHERE nome = ?";
   db.query(checkUserQuery, [nome], (err, results) => {
     if (err) {
@@ -51,10 +53,8 @@ app.post("/cadastrar", (req, res) => {
     }
 
     if (results.length > 0) {
-      // Usuário já existe, você pode apenas enviar uma resposta
       return res.send("Usuário já cadastrado");
     } else {
-      // Caso o usuário não exista, insira-o
       const sql = "INSERT INTO usuarios (nome) VALUES (?)";
       db.query(sql, [nome], (err, result) => {
         if (err) {
@@ -88,7 +88,6 @@ app.post("/atualizar-pontuacao", (req, res) => {
     return res.status(400).send("Nome e acertos são obrigatórios.");
   }
 
-  // Primeiro, busca a pontuação atual do usuário
   const getCurrentScoreQuery = "SELECT pontuacao FROM ranking WHERE nome = ?";
   db.query(getCurrentScoreQuery, [nome], (err, results) => {
     if (err) {
@@ -100,13 +99,11 @@ app.post("/atualizar-pontuacao", (req, res) => {
 
     let currentScore = 0;
     if (results.length > 0) {
-      currentScore = results[0].pontuacao; // Pontuação atual do usuário
+      currentScore = results[0].pontuacao;
     }
 
-    // Calcula a nova pontuação
     const newScore = currentScore + acertos;
 
-    // Atualiza a pontuação no banco de dados
     const sql =
       "INSERT INTO ranking (nome, pontuacao) VALUES (?, ?) ON DUPLICATE KEY UPDATE pontuacao = ?";
     db.query(sql, [nome, newScore, newScore], (err, result) => {
