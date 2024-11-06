@@ -1,8 +1,6 @@
-require("dotenv").config();
-app.use(express.static(__dirname)); // Servir arquivos estáticos na raiz do projeto
-
+require("dotenv").config(); // Para carregar as variáveis de ambiente
 const express = require("express");
-const mysql = require("mysql2");
+const { Client } = require("pg"); // Biblioteca para conectar ao PostgreSQL
 const bodyParser = require("body-parser");
 const cors = require("cors");
 
@@ -10,58 +8,48 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors());
-app.use(bodyParser.json());
+app.use(cors()); // Para permitir requisições de outras origens
+app.use(bodyParser.json()); // Para interpretar o corpo da requisição como JSON
 
-// Configuração da conexão com o banco de dados MySQL usando variáveis de ambiente
-const db = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  port: process.env.DB_PORT,
+// Configuração da conexão com o banco de dados PostgreSQL do Supabase
+const client = new Client({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false, // Necessário para conexões seguras com o Supabase
+  },
 });
 
 // Conectar ao banco de dados
-db.connect((err) => {
-  if (err) {
-    console.error("Erro ao conectar ao banco de dados:", err);
-    process.exit(1);
-  }
-  console.log("Conectado ao banco de dados!");
-});
+client
+  .connect()
+  .then(() => console.log("Conectado ao banco de dados!"))
+  .catch((err) => console.error("Erro ao conectar ao banco de dados:", err));
 
 // Iniciar o servidor
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
 
-app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/index.html"); // Verifique se `index.html` está na raiz do projeto
-});
-
 // Rota para cadastrar usuários
 app.post("/cadastrar", (req, res) => {
   const { nome } = req.body;
-
-  console.log("Cadastro recebido:", req.body);
 
   if (!nome) {
     return res.status(400).send("Nome é obrigatório");
   }
 
-  const checkUserQuery = "SELECT * FROM usuarios WHERE nome = ?";
-  db.query(checkUserQuery, [nome], (err, results) => {
+  const checkUserQuery = "SELECT * FROM usuarios WHERE nome = $1";
+  client.query(checkUserQuery, [nome], (err, results) => {
     if (err) {
       console.error("Erro ao verificar usuário:", err);
       return res.status(500).send("Erro ao verificar usuário: " + err.message);
     }
 
-    if (results.length > 0) {
+    if (results.rows.length > 0) {
       return res.send("Usuário já cadastrado");
     } else {
-      const sql = "INSERT INTO usuarios (nome) VALUES (?)";
-      db.query(sql, [nome], (err, result) => {
+      const sql = "INSERT INTO usuarios (nome) VALUES ($1)";
+      client.query(sql, [nome], (err, result) => {
         if (err) {
           console.error("Erro ao cadastrar usuário:", err);
           return res
@@ -77,15 +65,16 @@ app.post("/cadastrar", (req, res) => {
 // Rota para obter ranking
 app.get("/ranking", (req, res) => {
   const query = "SELECT * FROM ranking ORDER BY pontuacao DESC";
-  db.query(query, (err, results) => {
+  client.query(query, (err, results) => {
     if (err) {
       console.error("Erro ao obter ranking:", err);
       return res.status(500).json({ error: err.message });
     }
-    res.json(results);
+    res.json(results.rows);
   });
 });
 
+// Rota para atualizar pontuação
 app.post("/atualizar-pontuacao", (req, res) => {
   const { nome, acertos } = req.body;
 
@@ -93,8 +82,8 @@ app.post("/atualizar-pontuacao", (req, res) => {
     return res.status(400).send("Nome e acertos são obrigatórios.");
   }
 
-  const getCurrentScoreQuery = "SELECT pontuacao FROM ranking WHERE nome = ?";
-  db.query(getCurrentScoreQuery, [nome], (err, results) => {
+  const getCurrentScoreQuery = "SELECT pontuacao FROM ranking WHERE nome = $1";
+  client.query(getCurrentScoreQuery, [nome], (err, results) => {
     if (err) {
       console.error("Erro ao obter pontuação atual:", err);
       return res
@@ -103,15 +92,15 @@ app.post("/atualizar-pontuacao", (req, res) => {
     }
 
     let currentScore = 0;
-    if (results.length > 0) {
-      currentScore = results[0].pontuacao;
+    if (results.rows.length > 0) {
+      currentScore = results.rows[0].pontuacao;
     }
 
     const newScore = currentScore + acertos;
 
     const sql =
-      "INSERT INTO ranking (nome, pontuacao) VALUES (?, ?) ON DUPLICATE KEY UPDATE pontuacao = ?";
-    db.query(sql, [nome, newScore, newScore], (err, result) => {
+      "INSERT INTO ranking (nome, pontuacao) VALUES ($1, $2) ON CONFLICT (nome) DO UPDATE SET pontuacao = EXCLUDED.pontuacao";
+    client.query(sql, [nome, newScore], (err, result) => {
       if (err) {
         console.error("Erro ao atualizar pontuação:", err);
         return res
