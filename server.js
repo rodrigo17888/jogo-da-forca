@@ -3,9 +3,33 @@ const express = require("express");
 const { Client } = require("pg"); // Biblioteca para conectar ao PostgreSQL
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const path = require("path");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Servir arquivos estáticos da pasta 'public'
+app.use(express.static(path.join(__dirname, "public")));
+
+// Rota para a página inicial (index.html)
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+// Rota para ranking.html
+app.get("/ranking", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "ranking.html"));
+});
+
+// Rota para duvidas.html
+app.get("/duvidas", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "duvidas.html"));
+});
+
+// Rota para jogo.html
+app.get("/jogo", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "jogo.html"));
+});
 
 // Middleware
 app.use(cors()); // Para permitir requisições de outras origens
