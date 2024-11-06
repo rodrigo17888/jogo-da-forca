@@ -1,4 +1,5 @@
 require("dotenv").config();
+app.use(express.static(__dirname)); // Servir arquivos estáticos na raiz do projeto
 
 const express = require("express");
 const mysql = require("mysql2");
@@ -33,6 +34,10 @@ db.connect((err) => {
 // Iniciar o servidor
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
+});
+
+app.get("/", (req, res) => {
+  res.sendFile(__dirname + "/index.html"); // Verifique se `index.html` está na raiz do projeto
 });
 
 // Rota para cadastrar usuários
