@@ -10,6 +10,7 @@
     />
     <link rel="stylesheet" href="css/login.css" />
     <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.18.0/dist/supabase.min.js"></script>
   </head>
   <body>
     <div class="container">
@@ -31,6 +32,12 @@
     </div>
 
     <script>
+      // URL e chave do Supabase
+      const supabaseUrl = "https://mnakiqkfkuqdnlsvipyq.supabase.co";
+      const supabaseKey =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVsaXdkZnJlbHpodHpkYWdpYm5vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczMDkzMDgyMywiZXhwIjoyMDQ2NTA2ODIzfQ.bYjfLRhXrTtr7mL8kYoBfgj1sRZqFMi9UdEp1kCr1O8"; // Substitua com a chave da sua conta
+      const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
       // Verifica se o usuário já está logado
       const nomeUsuario = localStorage.getItem("nomeUsuario");
       if (nomeUsuario) {
@@ -40,7 +47,7 @@
       // Adiciona o evento de submit ao formulário
       document
         .getElementById("loginForm")
-        .addEventListener("submit", function (event) {
+        .addEventListener("submit", async function (event) {
           event.preventDefault();
           const username = document.getElementById("username").value.trim();
 
@@ -49,35 +56,24 @@
             return;
           }
 
-          // Determina a URL de acordo com o ambiente
-          const backendUrl =
-            window.location.hostname === "localhost"
-              ? "http://localhost:3000/cadastrar"
-              : "https://jogo-da-forca-ecru-two.vercel.app";
-
-          // Fazendo o cadastro via API
-          fetch(backendUrl, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ nome: username }),
-          })
-            .then((response) => {
-              if (!response.ok) {
-                throw new Error("Erro ao cadastrar usuário");
-              }
-              return response.text();
-            })
-            .then((message) => {
-              console.log(message);
-              localStorage.setItem("nomeUsuario", username);
-              window.location.href = "jogo.html";
-            })
-            .catch((error) => {
-              console.error(error);
-              alert("Erro ao cadastrar usuário. Tente novamente.");
+          // Cadastra o usuário no Supabase
+          try {
+            const { data, error } = await supabase.auth.signUp({
+              email: `${username}@example.com`, // Crie um e-mail fictício usando o nome do usuário
+              password: "jogodaforca123", // Senha padrão para o usuário
             });
+
+            if (error) {
+              throw new Error(error.message);
+            }
+
+            console.log("Usuário cadastrado com sucesso:", data);
+            localStorage.setItem("nomeUsuario", username);
+            window.location.href = "jogo.html";
+          } catch (error) {
+            console.error(error);
+            alert("Erro ao cadastrar usuário. Tente novamente.");
+          }
         });
     </script>
   </body>
