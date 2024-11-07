@@ -6,8 +6,9 @@ let tentativas = 6;
 let jogarNovamente = true;
 
 let listaDePalavras = [];
-let pontuacaoUsuario = 0; // Inicializa a pontuação
+let pontuacaoUsuario = 0;
 
+// Função para carregar as palavras do arquivo JSON
 async function carregarPalavras() {
   try {
     const resposta = await fetch("palavras.json");
@@ -19,6 +20,7 @@ async function carregarPalavras() {
   }
 }
 
+// Seleciona uma palavra secreta aleatória e define a categoria
 function criarPalavraSecreta() {
   const indexPalavra = parseInt(Math.random() * listaDePalavras.length);
   palavraSecretaSorteada = listaDePalavras[indexPalavra].nome;
@@ -27,6 +29,7 @@ function criarPalavraSecreta() {
 
 carregarPalavras();
 
+// Exibe a palavra na tela com espaços para letras
 function montarPalavraNaTela() {
   const categoria = document.getElementById("categoria");
   const palavraTela = document.getElementById("palavra-secreta");
@@ -35,48 +38,34 @@ function montarPalavraNaTela() {
   palavraTela.innerHTML = "";
 
   for (let i = 0; i < palavraSecretaSorteada.length; i++) {
-    if (listaDinamica[i] === undefined) {
-      if (palavraSecretaSorteada[i] === " ") {
-        listaDinamica[i] = " ";
-        palavraTela.innerHTML +=
-          "<div class='letrasEspaco'>" + listaDinamica[i] + "</div>";
-      } else {
-        listaDinamica[i] = "&nbsp;";
-        palavraTela.innerHTML +=
-          "<div class='letras'>" + listaDinamica[i] + "</div>";
-      }
-    } else {
-      if (palavraSecretaSorteada[i] === " ") {
-        listaDinamica[i] = " ";
-        palavraTela.innerHTML +=
-          "<div class='letrasEspaco'>" + listaDinamica[i] + "</div>";
-      } else {
-        palavraTela.innerHTML +=
-          "<div class='letras'>" + listaDinamica[i] + "</div>";
-      }
+    if (!listaDinamica[i]) {
+      listaDinamica[i] = palavraSecretaSorteada[i] === " " ? " " : "&nbsp;";
     }
+    const classe =
+      palavraSecretaSorteada[i] === " " ? "letrasEspaco" : "letras";
+    palavraTela.innerHTML += `<div class='${classe}'>${listaDinamica[i]}</div>`;
   }
 }
 
+// Verifica se a letra escolhida está correta
 function verificaLetraEscolhida(letra) {
-  document.getElementById("tecla-" + letra).disabled = true;
+  document.getElementById(`tecla-${letra}`).disabled = true;
   if (tentativas > 0) {
-    mudarStyleLetra("tecla-" + letra, false);
+    mudarStyleLetra(`tecla-${letra}`, false);
     comparaListas(letra);
     montarPalavraNaTela();
   }
 }
 
+// Atualiza o estilo da letra escolhida
 function mudarStyleLetra(tecla, condicao) {
-  if (condicao == false) {
-    document.getElementById(tecla).style.background = "#ff0000";
-    document.getElementById(tecla).style.color = "#ffffff";
-  } else {
-    document.getElementById(tecla).style.background = "#008000";
-    document.getElementById(tecla).style.color = "#ffffff";
-  }
+  const estilo = condicao
+    ? { background: "#008000", color: "#ffffff" }
+    : { background: "#ff0000", color: "#ffffff" };
+  Object.assign(document.getElementById(tecla).style, estilo);
 }
 
+// Verifica se a letra está na palavra e calcula pontuação
 async function comparaListas(letra) {
   const posicao = palavraSecretaSorteada.indexOf(letra);
   if (posicao < 0) {
@@ -86,54 +75,44 @@ async function comparaListas(letra) {
     if (tentativas === 0) {
       abreModal(
         "OPS!",
-        "Não foi dessa vez ... A palavra secreta era: <br> <br> <br>" +
-          `<p style='color: red; font-weight: bold; font-size: 20px;'>${palavraSecretaSorteada}</p>`
+        `Não foi dessa vez... A palavra secreta era: <br><p style='color: red; font-weight: bold; font-size: 20px;'>${palavraSecretaSorteada}</p>`
       );
       piscarBtnJogarNovamente();
     }
   } else {
-    mudarStyleLetra("tecla-" + letra, true);
+    mudarStyleLetra(`tecla-${letra}`, true);
     for (let i = 0; i < palavraSecretaSorteada.length; i++) {
-      if (palavraSecretaSorteada[i] === letra) {
-        listaDinamica[i] = letra;
-      }
+      if (palavraSecretaSorteada[i] === letra) listaDinamica[i] = letra;
     }
   }
 
-  let vitoria = true;
-  for (let i = 0; i < palavraSecretaSorteada.length; i++) {
-    if (palavraSecretaSorteada[i] !== listaDinamica[i]) {
-      vitoria = false;
-    }
-  }
-
+  const vitoria = listaDinamica.join("") === palavraSecretaSorteada;
   if (vitoria) {
-    // Definindo a lógica da pontuação baseada na categoria
-    const categoriaPontuacao =
-      palavraSecretaCategoria === "NOME DE PESSOA" ||
-      palavraSecretaCategoria === "TIME DE FUTEBOL" ||
-      palavraSecretaCategoria === "NOVELA"
-        ? 15
-        : 5;
-    pontuacaoUsuario += categoriaPontuacao; // Ajusta a lógica da pontuação conforme necessário
-
-    enviarPontuacao(
+    const categoriaPontuacao = [
+      "NOME DE PESSOA",
+      "TIME DE FUTEBOL",
+      "NOVELA",
+    ].includes(palavraSecretaCategoria)
+      ? 15
+      : 5;
+    pontuacaoUsuario += categoriaPontuacao;
+    await enviarPontuacao(
       localStorage.getItem("nomeUsuario"),
-      pontuacaoUsuario, // Certifique-se de que esse valor está correto
+      pontuacaoUsuario,
       palavraSecretaCategoria
     );
-    // Passa a categoria
     abreModal(
       "PARABÉNS",
-      `<p style='color: GREEN; font-weight: bold; font-size: 20px;'>VOCÊ ACERTOU A PALAVRA</p>`
+      "<p style='color: GREEN; font-weight: bold; font-size: 20px;'>VOCÊ ACERTOU A PALAVRA</p>"
     );
     tentativas = 0;
     piscarBtnJogarNovamente();
   }
 }
 
+// Faz o botão "Jogar Novamente" piscar
 async function piscarBtnJogarNovamente() {
-  while (jogarNovamente === true) {
+  while (jogarNovamente) {
     document.getElementById("reiniciar").style.backgroundColor = "#2BDC00";
     await atraso(500);
     document.getElementById("reiniciar").style.backgroundColor = "#A7DC38";
@@ -141,145 +120,86 @@ async function piscarBtnJogarNovamente() {
   }
 }
 
-async function atraso(tempo) {
-  return new Promise((x) => setTimeout(x, tempo));
+// Cria um atraso de tempo
+function atraso(tempo) {
+  return new Promise((resolve) => setTimeout(resolve, tempo));
 }
 
+// Atualiza a imagem da forca com base nas tentativas
 function carregarImagemForca() {
-  switch (tentativas) {
-    case 5:
-      document.getElementById("imagem").style.background =
-        "url('./img/forca01.png')";
-      break;
-    case 4:
-      document.getElementById("imagem").style.background =
-        "url('./img/forca02.png')";
-      break;
-    case 3:
-      document.getElementById("imagem").style.background =
-        "url('./img/forca03.png')";
-      break;
-    case 2:
-      document.getElementById("imagem").style.background =
-        "url('./img/forca04.png')";
-      break;
-    case 1:
-      document.getElementById("imagem").style.background =
-        "url('./img/forca05.png')";
-      break;
-    case 0:
-      document.getElementById("imagem").style.background =
-        "url('./img/forca06.png')";
-      break;
-    default:
-      document.getElementById("imagem").style.background =
-        "url('./img/forca.png')";
-  }
+  const imagens = [
+    "./img/forca.png",
+    "./img/forca01.png",
+    "./img/forca02.png",
+    "./img/forca03.png",
+    "./img/forca04.png",
+    "./img/forca05.png",
+    "./img/forca06.png",
+  ];
+  document.getElementById("imagem").style.background = `url('${
+    imagens[6 - tentativas]
+  }')`;
 }
 
+// Exibe o modal com uma mensagem
 function abreModal(titulo, mensagem) {
-  let modalTitulo = document.getElementById("exampleModalLabel");
-  let modalBody = document.getElementById("modalBody");
-  modalTitulo.innerText = titulo;
-  modalBody.innerHTML = mensagem;
-
-  $("#myModal").modal({
-    show: true,
-  });
+  document.getElementById("exampleModalLabel").innerText = titulo;
+  document.getElementById("modalBody").innerHTML = mensagem;
+  $("#myModal").modal("show");
 }
 
+// Envia a pontuação para a API
 async function enviarPontuacao(nome, acertos) {
   try {
-    // Envia os dados via fetch para sua API
     const resposta = await fetch("/api/atualizar-pontuacao", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ nome, acertos }), // Envia o nome e a pontuação
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nome, acertos }),
     });
-
-    if (!resposta.ok) {
-      throw new Error(`Erro HTTP: ${resposta.status}`);
-    }
-
-    const data = await resposta.json();
-    console.log("Pontuação salva com sucesso!", data);
+    if (!resposta.ok) throw new Error(`Erro HTTP: ${resposta.status}`);
+    console.log("Pontuação salva com sucesso!");
   } catch (error) {
     console.error("Erro ao enviar pontuação:", error);
   }
 }
 
+// Carrega o ranking ao carregar a página
 async function carregarRanking() {
   try {
-    const baseUrl =
-      window.location.hostname === "localhost"
-        ? "http://localhost:3000" // Para rodar localmente
-        : "https://jogo-da-forca-ecru-two.vercel.app/api/ranking"; // Para quando estiver no Vercel
-
-    const resposta = await fetch(`${baseUrl}/api/ranking`);
-    if (!resposta.ok) {
-      throw new Error(`Erro HTTP: ${resposta.status}`);
-    }
+    const resposta = await fetch("/api/ranking");
+    if (!resposta.ok) throw new Error(`Erro HTTP: ${resposta.status}`);
     const ranking = await resposta.json();
     console.log("Ranking carregado:", ranking);
   } catch (error) {
     console.error("Erro ao carregar o ranking:", error);
   }
 }
-
 document.addEventListener("DOMContentLoaded", carregarRanking);
 
+// Redireciona para a página de ranking
 function irParaRanking() {
   window.location.href = "ranking.html";
 }
 
+// Redireciona para a página de dúvidas
 function irParaDuvidas() {
   window.location.href = "duvidas.html";
 }
 
+// Cadastra o usuário e redireciona para o jogo
 function cadastrarUsuario(nome) {
   localStorage.setItem("nomeUsuario", nome);
   fetch("http://localhost:3000/cadastrar", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ nome: nome }), // Envia o nome do usuário
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ nome }),
   })
     .then((response) => {
-      if (!response.ok) {
-        throw new Error("Erro ao cadastrar usuário");
-      }
-      return response.text();
-    })
-    .then((message) => {
-      console.log(message); // Exibe a mensagem de sucesso
-      window.location.href = "jogo.html"; // Redireciona para o jogo
+      if (!response.ok) throw new Error("Erro ao cadastrar usuário");
+      window.location.href = "jogo.html";
     })
     .catch((error) => {
-      console.error(error); // Lida com erros
-      window.location.href = "jogo.html"; // Redireciona para o jogo se já estiver cadastrado
+      console.error(error);
+      window.location.href = "jogo.html";
     });
 }
-
-fetch("http://localhost:3000/cadastrar", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({ nome: nomeDoUsuario }), // Substitua pelo nome do usuário
-})
-  .then((response) => {
-    if (!response.ok) {
-      throw new Error("Erro ao cadastrar usuário");
-    }
-    return response.text();
-  })
-  .then((message) => {
-    console.log(message); // Exibe a mensagem de sucesso
-    // Redirecionar para o jogo ou carregar o jogo aqui
-  })
-  .catch((error) => {
-    console.error(error); // Lida com erros
-  });
