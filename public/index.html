@@ -33,51 +33,52 @@
     </div>
 
     <script>
-      // Substitua com a URL e chave do seu projeto no Supabase
-      const supabaseUrl = "https://eliwdfrelzhtzdagibno.supabase.co"; // URL do seu projeto no Supabase
-      const supabaseKey =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVsaXdkZnJlbHpodHpkYWdpYm5vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzA5MzA4MjMsImV4cCI6MjA0NjUwNjgyM30.CMuNNsTc8uufiKpccAv4-n5AdTdij8bccX7Gbh6HsjU"; // Sua chave pública (anon)
+      window.onload = function () {
+        // Substitua com a URL e chave do seu projeto no Supabase
+        const supabaseUrl = "https://your-project-id.supabase.co"; // URL do seu projeto no Supabase
+        const supabaseKey = "your-supabase-key"; // Sua chave pública (anon)
 
-      // Inicialize o cliente Supabase
-      const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        // Inicialize o cliente do Supabase
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-      // Verifica se o usuário já está logado
-      const nomeUsuario = localStorage.getItem("nomeUsuario");
-      if (nomeUsuario) {
-        window.location.href = "jogo.html";
-      }
+        // Verifica se o usuário já está logado
+        const nomeUsuario = localStorage.getItem("nomeUsuario");
+        if (nomeUsuario) {
+          window.location.href = "jogo.html";
+        }
 
-      // Adiciona o evento de submit ao formulário
-      document
-        .getElementById("loginForm")
-        .addEventListener("submit", function (event) {
-          event.preventDefault();
-          const username = document.getElementById("username").value.trim();
+        // Adiciona o evento de submit ao formulário
+        document
+          .getElementById("loginForm")
+          .addEventListener("submit", function (event) {
+            event.preventDefault();
+            const username = document.getElementById("username").value.trim();
 
-          if (!username) {
-            alert("Por favor, insira um nome.");
-            return;
-          }
+            if (!username) {
+              alert("Por favor, insira um nome.");
+              return;
+            }
 
-          // Fazendo o cadastro via Supabase
-          supabase
-            .from("usuarios") // Substitua com o nome da sua tabela no Supabase
-            .insert([{ nome: username }])
-            .then(({ data, error }) => {
-              if (error) {
+            // Fazendo o cadastro via Supabase
+            supabase
+              .from("usuarios") // Substitua com o nome da sua tabela no Supabase
+              .insert([{ nome: username }])
+              .then(({ data, error }) => {
+                if (error) {
+                  console.error(error);
+                  alert("Erro ao cadastrar usuário. Tente novamente.");
+                } else {
+                  console.log("Usuário cadastrado com sucesso", data);
+                  localStorage.setItem("nomeUsuario", username);
+                  window.location.href = "jogo.html";
+                }
+              })
+              .catch((error) => {
                 console.error(error);
                 alert("Erro ao cadastrar usuário. Tente novamente.");
-              } else {
-                console.log("Usuário cadastrado com sucesso", data);
-                localStorage.setItem("nomeUsuario", username);
-                window.location.href = "jogo.html";
-              }
-            })
-            .catch((error) => {
-              console.error(error);
-              alert("Erro ao cadastrar usuário. Tente novamente.");
-            });
-        });
+              });
+          });
+      };
     </script>
   </body>
 </html>
