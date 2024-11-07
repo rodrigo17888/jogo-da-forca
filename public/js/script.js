@@ -8,12 +8,6 @@ let jogarNovamente = true;
 let listaDePalavras = [];
 let pontuacaoUsuario = 0; // Inicializa a pontuação
 
-// Inicialização do Supabase
-const supabaseUrl = "https://eliwdfrelzhtzdagibno.supabase.co"; // URL do Supabase
-const supabaseKey =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVsaXdkZnJlbHpodHpkYWdpYm5vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzA5MzA4MjMsImV4cCI6MjA0NjUwNjgyM30.CMuNNsTc8uufiKpccAv4-n5AdTdij8bccX7Gbh6HsjU"; // Sua chave de API do Supabase
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-
 async function carregarPalavras() {
   try {
     const resposta = await fetch("palavras.json");
@@ -126,15 +120,13 @@ async function comparaListas(letra) {
 
     // Envia a pontuação ao Supabase
     try {
-      const { data, error } = await supabase
-        .from("ranking")
-        .upsert([
-          {
-            nome: localStorage.getItem("nomeUsuario"),
-            pontuacao: pontuacaoUsuario,
-            categoria: palavraSecretaCategoria,
-          },
-        ]);
+      const { data, error } = await supabase.from("ranking").upsert([
+        {
+          nome: localStorage.getItem("nomeUsuario"),
+          pontuacao: pontuacaoUsuario,
+          categoria: palavraSecretaCategoria,
+        },
+      ]);
 
       if (error) {
         throw error;
@@ -153,6 +145,12 @@ async function comparaListas(letra) {
     piscarBtnJogarNovamente();
   }
 }
+
+// Inicialização do Supabase
+const supabaseUrl = "https://eliwdfrelzhtzdagibno.supabase.co"; // URL do Supabase
+const supabaseKey =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVsaXdkZnJlbHpodHpkYWdpYm5vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzA5MzA4MjMsImV4cCI6MjA0NjUwNjgyM30.CMuNNsTc8uufiKpccAv4-n5AdTdij8bccX7Gbh6HsjU"; // Sua chave de API do Supabase
+const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
 // A função para carregar o ranking
 async function carregarRanking() {
