@@ -99,39 +99,32 @@ app.get("/ranking-db", (req, res) => {
 });
 
 // Rota para atualizar pontuação
-app.post("/atualizar-pontuacao", (req, res) => {
+app.post("/atualizar-pontuacao", async (req, res) => {
   const { nome, acertos } = req.body;
 
   if (!nome || acertos === undefined) {
     return res.status(400).send("Nome e acertos são obrigatórios.");
   }
 
-  const getCurrentScoreQuery = "SELECT pontuacao FROM ranking WHERE nome = $1";
-  client.query(getCurrentScoreQuery, [nome], (err, results) => {
-    if (err) {
-      console.error("Erro ao obter pontuação atual:", err);
-      return res
-        .status(500)
-        .send("Erro ao obter pontuação atual: " + err.message);
-    }
+  try {
+    const getCurrentScoreQuery =
+      "SELECT pontuacao FROM ranking WHERE nome = $1";
+    const results = await client.query(getCurrentScoreQuery, [nome]);
 
-    let currentScore = 0;
-    if (results.rows.length > 0) {
-      currentScore = results.rows[0].pontuacao;
-    }
-
+    let currentScore = results.rows.length > 0 ? results.rows[0].pontuacao : 0;
     const newScore = currentScore + acertos;
 
-    const sql =
-      "INSERT INTO ranking (nome, pontuacao) VALUES ($1, $2) ON CONFLICT (nome) DO UPDATE SET pontuacao = EXCLUDED.pontuacao";
-    client.query(sql, [nome, newScore], (err, result) => {
-      if (err) {
-        console.error("Erro ao atualizar pontuação:", err);
-        return res
-          .status(500)
-          .send("Erro ao atualizar pontuação: " + err.message);
-      }
-      res.send("Pontuação atualizada com sucesso!");
-    });
-  });
+    const sql = `
+      INSERT INTO ranking (nome, pontuacao) 
+      VALUES ($1, $2) 
+      ON CONFLICT (nome) DO UPDATE 
+      SET pontuacao = ranking.pontuacao + EXCLUDED.pontuacao;
+    `;
+    await client.query(sql, [nome, acertos]);
+
+    res.send("Pontuação atualizada com sucesso!");
+  } catch (error) {
+    console.error("Erro ao atualizar pontuação:", error);
+    res.status(500).send("Erro ao atualizar pontuação: " + error.message);
+  }
 });
