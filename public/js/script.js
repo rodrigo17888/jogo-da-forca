@@ -1,5 +1,3 @@
-import { createClient } from "@supabase/supabase-js";
-
 let palavraSecretaCategoria;
 let palavraSecretaSorteada;
 
