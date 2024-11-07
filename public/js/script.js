@@ -198,12 +198,6 @@ function abreModal(titulo, mensagem) {
   });
 }
 
-// Inicialização do Supabase
-const supabaseUrl = "https://eliwdfrelzhtzdagibno.supabase.co"; // URL do Supabase
-const supabaseKey =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVsaXdkZnJlbHpodHpkYWdpYm5vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzA5MzA4MjMsImV4cCI6MjA0NjUwNjgyM30.CMuNNsTc8uufiKpccAv4-n5AdTdij8bccX7Gbh6HsjU"; // Sua chave de API do Supabase
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-
 // Função para enviar a pontuação para o Supabase
 async function enviarPontuacao(nome, pontuacao) {
   try {
