@@ -29,6 +29,7 @@ function criarPalavraSecreta() {
   const indexPalavra = parseInt(Math.random() * listaDePalavras.length);
   palavraSecretaSorteada = listaDePalavras[indexPalavra].nome;
   palavraSecretaCategoria = listaDePalavras[indexPalavra].categoria;
+  listaDePalavras.splice(indexPalavra, 1); // Remove a palavra sorteada para evitar repetição
 }
 
 carregarPalavras();
@@ -123,23 +124,27 @@ async function comparaListas(letra) {
         : 5;
     pontuacaoUsuario += categoriaPontuacao; // Ajusta a lógica da pontuação conforme necessário
 
-    async function enviarPontuacao(nome, pontuacao, categoria) {
-      try {
-        const { data, error } = await supabase
-          .from("ranking") // Nome da tabela onde você vai inserir as pontuações
-          .upsert([{ nome, pontuacao, categoria }]);
+    // Envia a pontuação ao Supabase
+    try {
+      const { data, error } = await supabase
+        .from("ranking")
+        .upsert([
+          {
+            nome: localStorage.getItem("nomeUsuario"),
+            pontuacao: pontuacaoUsuario,
+            categoria: palavraSecretaCategoria,
+          },
+        ]);
 
-        if (error) {
-          throw error;
-        }
-
-        console.log("Pontuação enviada com sucesso:", data);
-      } catch (error) {
-        console.error("Erro ao enviar pontuação:", error);
+      if (error) {
+        throw error;
       }
+
+      console.log("Pontuação enviada com sucesso:", data);
+    } catch (error) {
+      console.error("Erro ao enviar pontuação:", error);
     }
 
-    // Passa a categoria
     abreModal(
       "PARABÉNS",
       `<p style='color: GREEN; font-weight: bold; font-size: 20px;'>VOCÊ ACERTOU A PALAVRA</p>`
@@ -149,79 +154,7 @@ async function comparaListas(letra) {
   }
 }
 
-async function piscarBtnJogarNovamente() {
-  while (jogarNovamente === true) {
-    document.getElementById("reiniciar").style.backgroundColor = "#2BDC00";
-    await atraso(500);
-    document.getElementById("reiniciar").style.backgroundColor = "#A7DC38";
-    await atraso(500);
-  }
-}
-
-async function atraso(tempo) {
-  return new Promise((x) => setTimeout(x, tempo));
-}
-
-function carregarImagemForca() {
-  switch (tentativas) {
-    case 5:
-      document.getElementById("imagem").style.background =
-        "url('./img/forca01.png')";
-      break;
-    case 4:
-      document.getElementById("imagem").style.background =
-        "url('./img/forca02.png')";
-      break;
-    case 3:
-      document.getElementById("imagem").style.background =
-        "url('./img/forca03.png')";
-      break;
-    case 2:
-      document.getElementById("imagem").style.background =
-        "url('./img/forca04.png')";
-      break;
-    case 1:
-      document.getElementById("imagem").style.background =
-        "url('./img/forca05.png')";
-      break;
-    case 0:
-      document.getElementById("imagem").style.background =
-        "url('./img/forca06.png')";
-      break;
-    default:
-      document.getElementById("imagem").style.background =
-        "url('./img/forca.png')";
-  }
-}
-
-function abreModal(titulo, mensagem) {
-  let modalTitulo = document.getElementById("exampleModalLabel");
-  let modalBody = document.getElementById("modalBody");
-  modalTitulo.innerText = titulo;
-  modalBody.innerHTML = mensagem;
-
-  $("#myModal").modal({
-    show: true,
-  });
-}
-
-async function enviarPontuacao(nome, pontuacao) {
-  try {
-    const response = await fetch("http://localhost:3000/atualizar-pontuacao", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ nome, acertos: pontuacao }), // Envia a pontuação
-    });
-
-    const data = await response.text();
-    console.log(data); // Loga a resposta do servidor
-  } catch (error) {
-    console.error("Erro ao enviar pontuação:", error);
-  }
-}
-
+// A função para carregar o ranking
 async function carregarRanking() {
   try {
     const { data: ranking, error } = await supabase
@@ -241,62 +174,25 @@ async function carregarRanking() {
       rankingLista.appendChild(li);
     });
   } catch (error) {
-    console.error("Erro ao carregar o ranking:", error);
+    console.error("Erro ao carregar ranking:", error);
   }
 }
 
-document.addEventListener("DOMContentLoaded", carregarRanking);
+// Função para cadastrar o usuário (já com verificação para evitar cadastro duplicado)
+async function cadastrarUsuario(nomeUsuario) {
+  if (!nomeUsuario) {
+    alert("Por favor, insira seu nome!");
+    return;
+  }
 
-function irParaRanking() {
-  window.location.href = "ranking.html";
+  localStorage.setItem("nomeUsuario", nomeUsuario); // Salva o nome no localStorage
+  const { data, error } = await supabase
+    .from("usuarios")
+    .upsert([{ nome: nomeUsuario }]);
+
+  if (error) {
+    console.error("Erro ao cadastrar o usuário:", error);
+  } else {
+    window.location.href = "jogo.html";
+  }
 }
-
-function irParaDuvidas() {
-  window.location.href = "duvidas.html";
-}
-
-function cadastrarUsuario(nome) {
-  localStorage.setItem("nomeUsuario", nome);
-  fetch("http://localhost:3000/cadastrar", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ nome: nome }), // Envia o nome do usuário
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Erro ao cadastrar usuário");
-      }
-      return response.text();
-    })
-    .then((message) => {
-      console.log(message); // Exibe a mensagem de sucesso
-      window.location.href = "jogo.html"; // Redireciona para o jogo
-    })
-    .catch((error) => {
-      console.error(error); // Lida com erros
-      window.location.href = "jogo.html"; // Redireciona para o jogo se já estiver cadastrado
-    });
-}
-
-fetch("http://localhost:3000/cadastrar", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({ nome: nomeDoUsuario }), // Substitua pelo nome do usuário
-})
-  .then((response) => {
-    if (!response.ok) {
-      throw new Error("Erro ao cadastrar usuário");
-    }
-    return response.text();
-  })
-  .then((message) => {
-    console.log(message); // Exibe a mensagem de sucesso
-    // Redirecionar para o jogo ou carregar o jogo aqui
-  })
-  .catch((error) => {
-    console.error(error); // Lida com erros
-  });
