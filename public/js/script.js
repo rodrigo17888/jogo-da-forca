@@ -117,11 +117,22 @@ async function comparaListas(letra) {
         : 5;
     pontuacaoUsuario += categoriaPontuacao; // Ajusta a lógica da pontuação conforme necessário
 
-    enviarPontuacao(
-      localStorage.getItem("nomeUsuario"),
-      pontuacaoUsuario, // Certifique-se de que esse valor está correto
-      palavraSecretaCategoria
-    );
+    async function enviarPontuacao(nome, pontuacao, categoria) {
+      try {
+        const { data, error } = await supabase
+          .from("ranking") // Nome da tabela onde você vai inserir as pontuações
+          .upsert([{ nome, pontuacao, categoria }]);
+
+        if (error) {
+          throw error;
+        }
+
+        console.log("Pontuação enviada com sucesso:", data);
+      } catch (error) {
+        console.error("Erro ao enviar pontuação:", error);
+      }
+    }
+
     // Passa a categoria
     abreModal(
       "PARABÉNS",
@@ -207,9 +218,16 @@ async function enviarPontuacao(nome, pontuacao) {
 
 async function carregarRanking() {
   try {
-    const response = await fetch("http://localhost:3000/ranking");
-    const ranking = await response.json();
-    // Aqui você pode manipular o DOM para exibir os dados do ranking
+    const { data: ranking, error } = await supabase
+      .from("ranking") // Nome da tabela onde as pontuações estão
+      .select("nome, pontuacao, categoria")
+      .order("pontuacao", { ascending: false }); // Ordenar pela pontuação (de maior para menor)
+
+    if (error) {
+      throw error;
+    }
+
+    // Exibir os dados no frontend
     const rankingLista = document.getElementById("rankingLista");
     ranking.forEach((item) => {
       const li = document.createElement("li");
