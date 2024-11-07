@@ -205,24 +205,6 @@ async function enviarPontuacao(nome, pontuacao) {
   }
 }
 
-async function carregarRanking() {
-  try {
-    const response = await fetch("http://localhost:3000/ranking");
-    const ranking = await response.json();
-    // Aqui você pode manipular o DOM para exibir os dados do ranking
-    const rankingLista = document.getElementById("rankingLista");
-    ranking.forEach((item) => {
-      const li = document.createElement("li");
-      li.textContent = `${item.nome}: ${item.pontuacao} pontos - Categoria: ${item.categoria}`;
-      rankingLista.appendChild(li);
-    });
-  } catch (error) {
-    console.error("Erro ao carregar o ranking:", error);
-  }
-}
-
-document.addEventListener("DOMContentLoaded", carregarRanking);
-
 function irParaRanking() {
   window.location.href = "ranking.html";
 }
@@ -256,23 +238,32 @@ function cadastrarUsuario(nome) {
     });
 }
 
-fetch("http://localhost:3000/cadastrar", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({ nome: nomeDoUsuario }), // Substitua pelo nome do usuário
-})
-  .then((response) => {
-    if (!response.ok) {
-      throw new Error("Erro ao cadastrar usuário");
-    }
-    return response.text();
-  })
-  .then((message) => {
-    console.log(message); // Exibe a mensagem de sucesso
-    // Redirecionar para o jogo ou carregar o jogo aqui
-  })
-  .catch((error) => {
-    console.error(error); // Lida com erros
-  });
+document.addEventListener("DOMContentLoaded", function () {
+  function cadastrarUsuario() {
+    const nomeDoUsuario = document.getElementById("nomeUsuarioInput").value;
+
+    fetch("http://localhost:3000/cadastrar", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ nome: nomeDoUsuario }), // Envia o nome do usuário
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Erro ao cadastrar usuário");
+        }
+        return response.text();
+      })
+      .then((message) => {
+        console.log(message); // Exibe a mensagem de sucesso
+        // Redirecionar para o jogo ou carregar o jogo aqui
+      })
+      .catch((error) => {
+        console.error(error); // Lida com erros
+      });
+  }
+
+  // A função pode ser chamada aqui ou associada ao evento do botão
+  document.querySelector("button").addEventListener("click", cadastrarUsuario);
+});
