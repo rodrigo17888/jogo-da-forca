@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "vercel dev",
     "start": "node index.js",
-    "build": "echo 'No build needed'"
+    "build": "echo 'No build needed'",
+    "type": "module"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.46.1",
