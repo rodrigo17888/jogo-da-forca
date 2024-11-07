@@ -49,12 +49,13 @@
             return;
           }
 
-          // Atualize a URL aqui para o ambiente de produção (no Vercel)
+          // Determina a URL de acordo com o ambiente
           const backendUrl =
             window.location.hostname === "localhost"
               ? "http://localhost:3000/cadastrar"
-              : "https://jogo-da-forca-ecru-two.vercel.app/";
+              : "https://jogo-da-forca-ecru-two.vercel.app";
 
+          // Fazendo o cadastro via API
           fetch(backendUrl, {
             method: "POST",
             headers: {
