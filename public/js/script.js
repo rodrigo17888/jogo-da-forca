@@ -266,12 +266,15 @@ function cadastrarUsuario(nome) {
     });
 }
 
+// Suponha que o nome do usuário seja obtido de um campo de entrada
+const nomeDoUsuario = document.getElementById("inputNomeUsuario").value; // AQUI você pega o nome do input
+
 fetch("http://localhost:3000/cadastrar", {
   method: "POST",
   headers: {
     "Content-Type": "application/json",
   },
-  body: JSON.stringify({ nome: nomeDoUsuario }), // Substitua pelo nome do usuário
+  body: JSON.stringify({ nome: nomeDoUsuario }), // Agora 'nomeDoUsuario' está definido
 })
   .then((response) => {
     if (!response.ok) {
