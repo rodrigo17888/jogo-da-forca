@@ -190,15 +190,16 @@ function abreModal(titulo, mensagem) {
 
 async function enviarPontuacao(nome, pontuacao) {
   try {
-    const { data, error } = await supabase
-      .from("ranking")
-      .upsert([{ nome, pontuacao }]);
+    const response = await fetch("http://localhost:3000/atualizar-pontuacao", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ nome, acertos: pontuacao }), // Envia a pontuação
+    });
 
-    if (error) {
-      console.error("Erro ao enviar pontuação:", error);
-    } else {
-      console.log("Pontuação enviada com sucesso:", data);
-    }
+    const data = await response.text();
+    console.log(data); // Loga a resposta do servidor
   } catch (error) {
     console.error("Erro ao enviar pontuação:", error);
   }
@@ -206,25 +207,72 @@ async function enviarPontuacao(nome, pontuacao) {
 
 async function carregarRanking() {
   try {
-    const { data, error } = await supabase
-      .from("ranking")
-      .select("*")
-      .order("pontuacao", { ascending: false });
-
-    if (error) {
-      console.error("Erro ao carregar o ranking:", error);
-    } else {
-      const rankingLista = document.getElementById("rankingLista");
-      data.forEach((item) => {
-        const li = document.createElement("li");
-        li.textContent = `${item.nome}: ${item.pontuacao} pontos`;
-        rankingLista.appendChild(li);
-      });
-    }
+    const response = await fetch("http://localhost:3000/ranking");
+    const ranking = await response.json();
+    // Aqui você pode manipular o DOM para exibir os dados do ranking
+    const rankingLista = document.getElementById("rankingLista");
+    ranking.forEach((item) => {
+      const li = document.createElement("li");
+      li.textContent = `${item.nome}: ${item.pontuacao} pontos - Categoria: ${item.categoria}`;
+      rankingLista.appendChild(li);
+    });
   } catch (error) {
     console.error("Erro ao carregar o ranking:", error);
   }
 }
 
-// Chamando o ranking quando necessário
-carregarRanking();
+document.addEventListener("DOMContentLoaded", carregarRanking);
+
+function irParaRanking() {
+  window.location.href = "ranking.html";
+}
+
+function irParaDuvidas() {
+  window.location.href = "duvidas.html";
+}
+
+function cadastrarUsuario(nome) {
+  localStorage.setItem("nomeUsuario", nome);
+  fetch("http://localhost:3000/cadastrar", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ nome: nome }), // Envia o nome do usuário
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Erro ao cadastrar usuário");
+      }
+      return response.text();
+    })
+    .then((message) => {
+      console.log(message); // Exibe a mensagem de sucesso
+      window.location.href = "jogo.html"; // Redireciona para o jogo
+    })
+    .catch((error) => {
+      console.error(error); // Lida com erros
+      window.location.href = "jogo.html"; // Redireciona para o jogo se já estiver cadastrado
+    });
+}
+
+fetch("http://localhost:3000/cadastrar", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({ nome: nomeDoUsuario }), // Substitua pelo nome do usuário
+})
+  .then((response) => {
+    if (!response.ok) {
+      throw new Error("Erro ao cadastrar usuário");
+    }
+    return response.text();
+  })
+  .then((message) => {
+    console.log(message); // Exibe a mensagem de sucesso
+    // Redirecionar para o jogo ou carregar o jogo aqui
+  })
+  .catch((error) => {
+    console.error(error); // Lida com erros
+  });
