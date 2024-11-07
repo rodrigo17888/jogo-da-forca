@@ -86,8 +86,8 @@ app.post("/cadastrar", (req, res) => {
   });
 });
 
-// Rota para obter ranking
-app.get("/ranking", (req, res) => {
+// Rota para obter o ranking
+app.get("/ranking-db", (req, res) => {
   const query = "SELECT * FROM ranking ORDER BY pontuacao DESC";
   client.query(query, (err, results) => {
     if (err) {

@@ -8,8 +8,9 @@
     "build": "echo 'No build needed'"
   },
   "dependencies": {
-    "pg": "^8.8.0",
+    "@supabase/supabase-js": "^2.46.1",
     "cors": "^2.8.5",
-    "dotenv": "^10.0.0"
+    "dotenv": "^10.0.0",
+    "pg": "^8.8.0"
   }
 }
