@@ -1,3 +1,5 @@
+import { createClient } from "@supabase/supabase-js";
+
 let palavraSecretaCategoria;
 let palavraSecretaSorteada;
 
@@ -8,15 +10,10 @@ let jogarNovamente = true;
 let listaDePalavras = [];
 let pontuacaoUsuario = 0; // Inicializa a pontuação
 
-window.onload = function () {
-  // Substitua com a URL e chave do seu projeto no Supabase
-  const supabaseUrl = "https://eliwdfrelzhtzdagibno.supabase.co"; // URL do seu projeto no Supabase
-  const supabaseKey =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVsaXdkZnJlbHpodHpkYWdpYm5vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzA5MzA4MjMsImV4cCI6MjA0NjUwNjgyM30.CMuNNsTc8uufiKpccAv4-n5AdTdij8bccX7Gbh6HsjU"; // Sua chave pública (anon)
-
-  // Inicialize o cliente do Supabase
-  const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-};
+const supabase = createClient(
+  "https://mnakiqkfkuqdnlsvipyq.supabase.co",
+  "postgres://postgres:rodrigolopes0305@aws-0-us-west-1.pooler.supabase.com:6543/jogo_da_forca"
+);
 
 async function carregarPalavras() {
   try {
