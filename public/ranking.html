@@ -45,35 +45,47 @@
     </div>
 
     <script
-      src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@1.35.6/dist/umd/supabase.min.js"
+      src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.0.0/dist/umd/supabase.min.js"
       defer
     ></script>
+
     <script>
+      // Configuração do cliente Supabase
+      const supabase = supabase.createClient(
+        "https://mnakiqkfkuqdnlsvipyq.supabase.co", // URL do seu Supabase
+        "postgres://postgres:rodrigolopes0305@aws-0-us-west-1.pooler.supabase.com:6543/jogo_da_forca" // Sua chave de acesso do Supabase
+      );
+
       async function carregarRanking() {
         const loadingIndicator = document.getElementById("loading");
         loadingIndicator.style.display = "block";
 
         try {
-          const response = await fetch("http://localhost:3000/ranking");
+          // Obtendo dados do Supabase (substitua o endpoint correto)
+          const { data: ranking, error } = await supabase
+            .from("ranking") // Nome da sua tabela de ranking
+            .select("*")
+            .order("pontuacao", { ascending: false }); // Ordena pela pontuação de forma decrescente
 
-          if (!response.ok) {
-            throw new Error(`Erro ao buscar dados: ${response.statusText}`);
+          if (error) {
+            throw new Error(`Erro ao buscar dados: ${error.message}`);
           }
 
-          const ranking = await response.json();
           const rankingTable = document.getElementById("ranking-table");
           rankingTable.innerHTML = "";
 
+          // Populando a tabela de ranking
           ranking.forEach((usuario, index) => {
             const row = document.createElement("tr");
             row.innerHTML = `
-                        <td>${index + 1}</td>
-                        <td>${usuario.nome}</td>
-                        <td>${usuario.pontuacao}</td>
-                    `;
+              <td>${index + 1}</td>
+              <td>${usuario.nome}</td>
+              <td>${usuario.pontuacao}</td>
+            `;
             rankingTable.appendChild(row);
           });
 
+          // Exibindo a posição do usuário
           const nomeUsuario = localStorage.getItem("nomeUsuario");
           const meuRankingDiv = document.getElementById("meuRanking");
           const meuUsuario = ranking.find((user) => user.nome === nomeUsuario);

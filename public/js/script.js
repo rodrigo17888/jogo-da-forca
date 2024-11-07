@@ -8,11 +8,6 @@ let jogarNovamente = true;
 let listaDePalavras = [];
 let pontuacaoUsuario = 0; // Inicializa a pontuação
 
-const supabase = createClient(
-  "https://mnakiqkfkuqdnlsvipyq.supabase.co",
-  "postgres://postgres:rodrigolopes0305@aws-0-us-west-1.pooler.supabase.com:6543/jogo_da_forca"
-);
-
 async function carregarPalavras() {
   try {
     const resposta = await fetch("palavras.json");
