@@ -266,26 +266,31 @@ function cadastrarUsuario(nome) {
     });
 }
 
-// Suponha que o nome do usuário seja obtido de um campo de entrada
-const nomeDoUsuario = document.getElementById("inputNomeUsuario").value; // AQUI você pega o nome do input
+window.onload = function () {
+  const nomeDoUsuario = document.getElementById("inputNomeUsuario").value;
 
-fetch("http://localhost:3000/cadastrar", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({ nome: nomeDoUsuario }), // Agora 'nomeDoUsuario' está definido
-})
-  .then((response) => {
-    if (!response.ok) {
-      throw new Error("Erro ao cadastrar usuário");
-    }
-    return response.text();
-  })
-  .then((message) => {
-    console.log(message); // Exibe a mensagem de sucesso
-    // Redirecionar para o jogo ou carregar o jogo aqui
-  })
-  .catch((error) => {
-    console.error(error); // Lida com erros
-  });
+  if (nomeDoUsuario) {
+    fetch("http://localhost:3000/cadastrar", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ nome: nomeDoUsuario }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Erro ao cadastrar usuário");
+        }
+        return response.text();
+      })
+      .then((message) => {
+        console.log(message); // Exibe a mensagem de sucesso
+        // Redirecionar para o jogo ou carregar o jogo aqui
+      })
+      .catch((error) => {
+        console.error(error); // Lida com erros
+      });
+  } else {
+    console.error("Nome do usuário não fornecido.");
+  }
+};
