@@ -45,69 +45,76 @@
     </div>
 
     <script
-      src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.0.0/dist/umd/supabase.min.js"
+      src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@1.35.6/dist/umd/supabase.min.js"
       defer
     ></script>
-
     <script>
-      // Configuração do cliente Supabase
-      const supabase = supabase.createClient(
-        "https://mnakiqkfkuqdnlsvipyq.supabase.co", // URL do seu Supabase
-        "postgres://postgres:rodrigolopes0305@aws-0-us-west-1.pooler.supabase.com:6543/jogo_da_forca" // Sua chave de acesso do Supabase
-      );
+      // Função que será executada ao carregar a página
+      window.onload = async function () {
+        // Substitua com a URL e chave do seu projeto no Supabase
+        const supabaseUrl = "https://eliwdfrelzhtzdagibno.supabase.co"; // URL do seu projeto no Supabase
+        const supabaseKey =
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVsaXdkZnJlbHpodHpkYWdpYm5vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzA5MzA4MjMsImV4cCI6MjA0NjUwNjgyM30.CMuNNsTc8uufiKpccAv4-n5AdTdij8bccX7Gbh6HsjU"; // Sua chave pública (anon)
 
-      async function carregarRanking() {
-        const loadingIndicator = document.getElementById("loading");
-        loadingIndicator.style.display = "block";
+        // Inicialize o cliente do Supabase
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-        try {
-          // Obtendo dados do Supabase (substitua o endpoint correto)
-          const { data: ranking, error } = await supabase
-            .from("ranking") // Nome da sua tabela de ranking
-            .select("*")
-            .order("pontuacao", { ascending: false }); // Ordena pela pontuação de forma decrescente
+        async function carregarRanking() {
+          const loadingIndicator = document.getElementById("loading");
+          loadingIndicator.style.display = "block"; // Exibe a mensagem de carregamento
 
-          if (error) {
-            throw new Error(`Erro ao buscar dados: ${error.message}`);
+          try {
+            // Consultando dados da tabela 'ranking' no Supabase
+            const { data: ranking, error } = await supabase
+              .from("ranking") // Nome da sua tabela
+              .select("*")
+              .order("pontuacao", { ascending: false }); // Ordena pela pontuação
+
+            if (error) {
+              throw new Error(`Erro ao buscar dados: ${error.message}`);
+            }
+
+            const rankingTable = document.getElementById("ranking-table");
+            rankingTable.innerHTML = "";
+
+            // Preenchendo a tabela com os dados do ranking
+            ranking.forEach((usuario, index) => {
+              const row = document.createElement("tr");
+              row.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${usuario.nome}</td>
+                <td>${usuario.pontuacao}</td>
+              `;
+              rankingTable.appendChild(row);
+            });
+
+            // Exibindo a posição do usuário
+            const nomeUsuario = localStorage.getItem("nomeUsuario");
+            const meuRankingDiv = document.getElementById("meuRanking");
+            const meuUsuario = ranking.find(
+              (user) => user.nome === nomeUsuario
+            );
+            if (meuUsuario) {
+              meuRankingDiv.innerHTML = `<strong>Você está na posição: ${
+                ranking.indexOf(meuUsuario) + 1
+              } com ${meuUsuario.pontuacao} pontos!</strong>`;
+            } else {
+              meuRankingDiv.innerHTML =
+                "<strong>Você ainda não tem pontuação registrada.</strong>";
+            }
+          } catch (error) {
+            console.error("Erro ao carregar ranking:", error);
+            alert(
+              "Não foi possível carregar o ranking. Tente novamente mais tarde."
+            );
+          } finally {
+            loadingIndicator.style.display = "none"; // Oculta a mensagem de carregamento
           }
-
-          const rankingTable = document.getElementById("ranking-table");
-          rankingTable.innerHTML = "";
-
-          // Populando a tabela de ranking
-          ranking.forEach((usuario, index) => {
-            const row = document.createElement("tr");
-            row.innerHTML = `
-              <td>${index + 1}</td>
-              <td>${usuario.nome}</td>
-              <td>${usuario.pontuacao}</td>
-            `;
-            rankingTable.appendChild(row);
-          });
-
-          // Exibindo a posição do usuário
-          const nomeUsuario = localStorage.getItem("nomeUsuario");
-          const meuRankingDiv = document.getElementById("meuRanking");
-          const meuUsuario = ranking.find((user) => user.nome === nomeUsuario);
-          if (meuUsuario) {
-            meuRankingDiv.innerHTML = `<strong>Você está na posição: ${
-              ranking.indexOf(meuUsuario) + 1
-            } com ${meuUsuario.pontuacao} pontos!</strong>`;
-          } else {
-            meuRankingDiv.innerHTML =
-              "<strong>Você ainda não tem pontuação registrada.</strong>";
-          }
-        } catch (error) {
-          console.error("Erro ao carregar ranking:", error);
-          alert(
-            "Não foi possível carregar o ranking. Tente novamente mais tarde."
-          );
-        } finally {
-          loadingIndicator.style.display = "none";
         }
-      }
 
-      window.onload = carregarRanking;
+        // Chama a função para carregar o ranking ao carregar a página
+        carregarRanking();
+      };
     </script>
   </body>
 </html>

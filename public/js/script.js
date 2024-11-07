@@ -188,38 +188,28 @@ function abreModal(titulo, mensagem) {
   });
 }
 
-// Função para enviar a pontuação para o Supabase
 async function enviarPontuacao(nome, pontuacao) {
   try {
-    // Envia a pontuação ao Supabase
-    const { data, error } = await supabase
-      .from("ranking") // Nome da tabela onde as pontuações estão
-      .upsert([{ nome: nome, pontuacao: pontuacao }]);
+    const response = await fetch("http://localhost:3000/atualizar-pontuacao", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ nome, acertos: pontuacao }), // Envia a pontuação
+    });
 
-    if (error) {
-      throw error;
-    }
-
-    console.log("Pontuação enviada com sucesso:", data);
+    const data = await response.text();
+    console.log(data); // Loga a resposta do servidor
   } catch (error) {
     console.error("Erro ao enviar pontuação:", error);
   }
 }
 
-// Função para carregar o ranking do Supabase
 async function carregarRanking() {
   try {
-    // Busca as pontuações no Supabase e ordena pelo maior valor
-    const { data: ranking, error } = await supabase
-      .from("ranking")
-      .select("nome, pontuacao, categoria")
-      .order("pontuacao", { ascending: false }); // Ordena pela pontuação (de maior para menor)
-
-    if (error) {
-      throw error;
-    }
-
-    // Exibir os dados do ranking no frontend
+    const response = await fetch("http://localhost:3000/ranking");
+    const ranking = await response.json();
+    // Aqui você pode manipular o DOM para exibir os dados do ranking
     const rankingLista = document.getElementById("rankingLista");
     ranking.forEach((item) => {
       const li = document.createElement("li");
@@ -227,7 +217,7 @@ async function carregarRanking() {
       rankingLista.appendChild(li);
     });
   } catch (error) {
-    console.error("Erro ao carregar ranking:", error);
+    console.error("Erro ao carregar o ranking:", error);
   }
 }
 
@@ -266,31 +256,23 @@ function cadastrarUsuario(nome) {
     });
 }
 
-window.onload = function () {
-  const nomeDoUsuario = document.getElementById("inputNomeUsuario").value;
-
-  if (nomeDoUsuario) {
-    fetch("http://localhost:3000/cadastrar", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ nome: nomeDoUsuario }),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Erro ao cadastrar usuário");
-        }
-        return response.text();
-      })
-      .then((message) => {
-        console.log(message); // Exibe a mensagem de sucesso
-        // Redirecionar para o jogo ou carregar o jogo aqui
-      })
-      .catch((error) => {
-        console.error(error); // Lida com erros
-      });
-  } else {
-    console.error("Nome do usuário não fornecido.");
-  }
-};
+fetch("http://localhost:3000/cadastrar", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({ nome: nomeDoUsuario }), // Substitua pelo nome do usuário
+})
+  .then((response) => {
+    if (!response.ok) {
+      throw new Error("Erro ao cadastrar usuário");
+    }
+    return response.text();
+  })
+  .then((message) => {
+    console.log(message); // Exibe a mensagem de sucesso
+    // Redirecionar para o jogo ou carregar o jogo aqui
+  })
+  .catch((error) => {
+    console.error(error); // Lida com erros
+  });
