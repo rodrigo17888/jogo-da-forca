@@ -1,35 +1,30 @@
-// api/atualizar-pontuacao.js
+// api/ranking.js
 
 import { createClient } from "@supabase/supabase-js";
 
-// Configuração do Supabase
 const supabase = createClient(
   "https://mnakiqkfkuqdnlsvipyq.supabase.co", // URL do Supabase
-  "your-anon-key" // Chave de API pública (anon key)
+  "your-anon-key" // Chave de API pública
 );
 
 export default async function handler(req, res) {
-  if (req.method === "POST") {
-    const { nome, acertos } = req.body;
-
+  if (req.method === "GET") {
     try {
-      // Insere os dados no banco de dados
+      // Consulta o ranking do banco de dados
       const { data, error } = await supabase
         .from("ranking")
-        .insert([{ nome, pontuacao: acertos }]);
+        .select("*")
+        .order("pontuacao", { ascending: false }); // Ordena pela pontuação
 
       if (error) {
         throw new Error(error.message);
       }
 
-      res.status(200).json({ message: "Pontuação salva com sucesso!" });
+      res.status(200).json(data);
     } catch (error) {
       res
         .status(500)
-        .json({
-          error: "Erro ao atualizar a pontuação",
-          details: error.message,
-        });
+        .json({ error: "Erro ao carregar o ranking", details: error.message });
     }
   } else {
     res.status(405).json({ message: "Método não permitido" });

@@ -188,18 +188,23 @@ function abreModal(titulo, mensagem) {
   });
 }
 
-async function enviarPontuacao(nome, pontuacao) {
+async function enviarPontuacao(nome, acertos) {
   try {
-    const response = await fetch("http://localhost:3000/atualizar-pontuacao", {
+    // Envia os dados via fetch para sua API
+    const resposta = await fetch("/api/atualizar-pontuacao", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ nome, acertos: pontuacao }), // Envia a pontuação
+      body: JSON.stringify({ nome, acertos }), // Envia o nome e a pontuação
     });
 
-    const data = await response.text();
-    console.log(data); // Loga a resposta do servidor
+    if (!resposta.ok) {
+      throw new Error(`Erro HTTP: ${resposta.status}`);
+    }
+
+    const data = await resposta.json();
+    console.log("Pontuação salva com sucesso!", data);
   } catch (error) {
     console.error("Erro ao enviar pontuação:", error);
   }
@@ -207,15 +212,17 @@ async function enviarPontuacao(nome, pontuacao) {
 
 async function carregarRanking() {
   try {
-    const response = await fetch("http://localhost:3000/ranking");
-    const ranking = await response.json();
-    // Aqui você pode manipular o DOM para exibir os dados do ranking
-    const rankingLista = document.getElementById("rankingLista");
-    ranking.forEach((item) => {
-      const li = document.createElement("li");
-      li.textContent = `${item.nome}: ${item.pontuacao} pontos - Categoria: ${item.categoria}`;
-      rankingLista.appendChild(li);
-    });
+    const baseUrl =
+      window.location.hostname === "localhost"
+        ? "http://localhost:3000" // Para rodar localmente
+        : "https://jogo-da-forca-ecru-two.vercel.app/api/ranking"; // Para quando estiver no Vercel
+
+    const resposta = await fetch(`${baseUrl}/api/ranking`);
+    if (!resposta.ok) {
+      throw new Error(`Erro HTTP: ${resposta.status}`);
+    }
+    const ranking = await resposta.json();
+    console.log("Ranking carregado:", ranking);
   } catch (error) {
     console.error("Erro ao carregar o ranking:", error);
   }
