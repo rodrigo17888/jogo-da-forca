@@ -46,6 +46,7 @@ h1 i {
 
 .table {
   width: 100%;
+  margin: 0 auto; /* Centraliza a tabela horizontalmente */
   margin-top: 20px;
   border-collapse: collapse;
   max-height: 300px;
@@ -133,5 +134,11 @@ h1 i {
 
   .table tr {
     font-size: 15px;
+  }
+}
+
+@media (min-width: 767px) {
+  .table {
+    width: 33%; /* Ajuste a largura para telas maiores */
   }
 }
