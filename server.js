@@ -1,6 +1,6 @@
-require("dotenv").config(); // Para carregar as variáveis de ambiente
+require("dotenv").config();
 const express = require("express");
-const { Client } = require("pg"); // Biblioteca para conectar ao PostgreSQL
+const { Client } = require("pg");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const path = require("path");
@@ -8,53 +8,43 @@ const path = require("path");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Servir arquivos estáticos da pasta 'public'
 app.use(express.static(path.join(__dirname, "public")));
 
-// Rota para a página inicial (index.html)
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// Rota para ranking.html
 app.get("/ranking", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "ranking.html"));
 });
 
-// Rota para duvidas.html
 app.get("/duvidas", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "duvidas.html"));
 });
 
-// Rota para jogo.html
 app.get("/jogo", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "jogo.html"));
 });
 
-// Middleware
-app.use(cors()); // Para permitir requisições de outras origens
-app.use(bodyParser.json()); // Para interpretar o corpo da requisição como JSON
+app.use(cors());
+app.use(bodyParser.json());
 
-// Configuração da conexão com o banco de dados PostgreSQL do Supabase
 const client = new Client({
   connectionString: process.env.DATABASE_URL,
   ssl: {
-    rejectUnauthorized: false, // Necessário para conexões seguras com o Supabase
+    rejectUnauthorized: false,
   },
 });
 
-// Conectar ao banco de dados
 client
   .connect()
   .then(() => console.log("Conectado ao banco de dados!"))
   .catch((err) => console.error("Erro ao conectar ao banco de dados:", err));
 
-// Iniciar o servidor
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
 
-// Rota para cadastrar usuários
 app.post("/cadastrar", (req, res) => {
   const { nome } = req.body;
 
@@ -86,7 +76,6 @@ app.post("/cadastrar", (req, res) => {
   });
 });
 
-// Rota para obter o ranking
 app.get("/ranking-db", (req, res) => {
   const query = "SELECT * FROM ranking ORDER BY pontuacao DESC";
   client.query(query, (err, results) => {
@@ -98,7 +87,6 @@ app.get("/ranking-db", (req, res) => {
   });
 });
 
-// Rota para atualizar pontuação
 app.post("/atualizar-pontuacao", (req, res) => {
   const { nome, acertos } = req.body;
 
