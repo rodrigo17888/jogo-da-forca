@@ -49,26 +49,26 @@
       defer
     ></script>
     <script>
-      // Função que será executada ao carregar a página
-      window.onload = async function () {
-        // Substitua com a URL e chave do seu projeto no Supabase
-        const supabaseUrl = "https://eliwdfrelzhtzdagibno.supabase.co"; // URL do seu projeto no Supabase
-        const supabaseKey =
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVsaXdkZnJlbHpodHpkYWdpYm5vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzA5MzA4MjMsImV4cCI6MjA0NjUwNjgyM30.CMuNNsTc8uufiKpccAv4-n5AdTdij8bccX7Gbh6HsjU"; // Sua chave pública (anon)
+      window.addEventListener("load", () => {
+        document.body.classList.add("fade-in");
+      });
 
-        // Inicialize o cliente do Supabase
+      window.onload = async function () {
+        const supabaseUrl = "https://eliwdfrelzhtzdagibno.supabase.co";
+        const supabaseKey =
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVsaXdkZnJlbHpodHpkYWdpYm5vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzA5MzA4MjMsImV4cCI6MjA0NjUwNjgyM30.CMuNNsTc8uufiKpccAv4-n5AdTdij8bccX7Gbh6HsjU";
+
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
         async function carregarRanking() {
           const loadingIndicator = document.getElementById("loading");
-          loadingIndicator.style.display = "block"; // Exibe a mensagem de carregamento
+          loadingIndicator.style.display = "block";
 
           try {
-            // Consultando dados da tabela 'ranking' no Supabase
             const { data: ranking, error } = await supabase
-              .from("ranking") // Nome da sua tabela
+              .from("ranking")
               .select("*")
-              .order("pontuacao", { ascending: false }); // Ordena pela pontuação
+              .order("pontuacao", { ascending: false });
 
             if (error) {
               throw new Error(`Erro ao buscar dados: ${error.message}`);
@@ -77,7 +77,6 @@
             const rankingTable = document.getElementById("ranking-table");
             rankingTable.innerHTML = "";
 
-            // Preenchendo a tabela com os dados do ranking
             ranking.forEach((usuario, index) => {
               const row = document.createElement("tr");
               row.innerHTML = `
@@ -88,7 +87,6 @@
               rankingTable.appendChild(row);
             });
 
-            // Exibindo a posição do usuário
             const nomeUsuario = localStorage.getItem("nomeUsuario");
             const meuRankingDiv = document.getElementById("meuRanking");
             const meuUsuario = ranking.find(
@@ -108,11 +106,10 @@
               "Não foi possível carregar o ranking. Tente novamente mais tarde."
             );
           } finally {
-            loadingIndicator.style.display = "none"; // Oculta a mensagem de carregamento
+            loadingIndicator.style.display = "none";
           }
         }
 
-        // Chama a função para carregar o ranking ao carregar a página
         carregarRanking();
       };
     </script>

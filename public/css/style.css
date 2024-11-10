@@ -12,6 +12,12 @@ body {
   margin-top: 10px;
   background-color: #a7dc38;
   font-family: "Ubuntu", sans-serif;
+  opacity: 0;
+  transition: opacity 0.5s ease; /* Tempo de transição */
+}
+
+.fade-in {
+  opacity: 1;
 }
 
 .container {
@@ -127,14 +133,48 @@ body {
   background: #8b008b37;
 }
 
+/* Animação de fade-out para sair */
+.fade-out {
+  animation: fadeOut 0.5s ease forwards;
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Animação de fade-in para entrar */
+.fade-in {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 @media (min-width: 321px) {
   .teclas button {
-    width: 25px;
-    height: 25px;
+    width: 29px;
+    height: 29px;
   }
 
   #categoria {
-    font-size: 1.2em;
+    font-size: 1.1em;
+  }
+
+  #ranking,
+  #ajuda {
+    width: 50px;
+    height: 50px;
   }
 }
 
@@ -153,7 +193,8 @@ body {
   }
 
   #categoria {
-    font-size: 1.5em;
+    font-size: 1em;
+    padding: 10px;
   }
 }
 

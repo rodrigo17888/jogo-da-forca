@@ -14,6 +14,12 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  opacity: 0;
+  transition: opacity 0.5s ease; /* Tempo de transição */
+}
+
+.fade-in {
+  opacity: 1;
 }
 
 .container {
@@ -87,4 +93,42 @@ h1 i {
   margin-top: 20px;
   font-weight: bold;
   color: #8b008b;
+}
+
+/* Animação de fade-out para sair */
+.fade-out {
+  animation: fadeOut 0.5s ease forwards;
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Animação de fade-in para entrar */
+.fade-in {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (min-width: 321px) {
+  .mt-4 {
+    font-size: 35px;
+  }
+
+  .table tr {
+    font-size: 15px;
+  }
 }

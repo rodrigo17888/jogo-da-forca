@@ -10,7 +10,7 @@
     />
     <link rel="stylesheet" href="css/login.css" />
     <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
-    <!-- Adiciona o SDK do Supabase -->
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.21.0/dist/umd/supabase.min.js"></script>
   </head>
   <body>
@@ -33,22 +33,22 @@
     </div>
 
     <script>
-      window.onload = function () {
-        // Substitua com a URL e chave do seu projeto no Supabase
-        const supabaseUrl = "https://eliwdfrelzhtzdagibno.supabase.co"; // URL do seu projeto no Supabase
-        const supabaseKey =
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVsaXdkZnJlbHpodHpkYWdpYm5vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzA5MzA4MjMsImV4cCI6MjA0NjUwNjgyM30.CMuNNsTc8uufiKpccAv4-n5AdTdij8bccX7Gbh6HsjU"; // Sua chave pública (anon)
+      window.addEventListener("load", () => {
+        document.body.classList.add("fade-in");
+      });
 
-        // Inicialize o cliente do Supabase
+      window.onload = function () {
+        const supabaseUrl = "https://eliwdfrelzhtzdagibno.supabase.co";
+        const supabaseKey =
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVsaXdkZnJlbHpodHpkYWdpYm5vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzA5MzA4MjMsImV4cCI6MjA0NjUwNjgyM30.CMuNNsTc8uufiKpccAv4-n5AdTdij8bccX7Gbh6HsjU";
+
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-        // Verifica se o usuário já está logado
         const nomeUsuario = localStorage.getItem("nomeUsuario");
         if (nomeUsuario) {
           window.location.href = "jogo.html";
         }
 
-        // Adiciona o evento de submit ao formulário
         document
           .getElementById("loginForm")
           .addEventListener("submit", function (event) {
@@ -60,9 +60,8 @@
               return;
             }
 
-            // Fazendo o cadastro via Supabase
             supabase
-              .from("usuarios") // Substitua com o nome da sua tabela no Supabase
+              .from("usuarios")
               .insert([{ nome: username }])
               .then(({ data, error }) => {
                 if (error) {
