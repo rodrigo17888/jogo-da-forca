@@ -137,7 +137,7 @@ h1 i {
   }
 }
 
-@media (min-width: 767px) {
+@media (min-width: 1000px) {
   .table {
     width: 33%; /* Ajuste a largura para telas maiores */
   }
