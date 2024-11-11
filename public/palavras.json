@@ -51,6 +51,7 @@
   { "nome": "ALMA GEMEA", "categoria": "NOVELA" },
   { "nome": "MARIMAR", "categoria": "NOVELA" },
   { "nome": "TERRA NOSTRA", "categoria": "NOVELA" },
+  { "nome": "TERRA E PAIXAO", "categoria": "NOVELA" },
   { "nome": "BABILONIA", "categoria": "NOVELA" },
   { "nome": "CHIQUITITAS", "categoria": "NOVELA" },
   { "nome": "AMORES ROUBADOS", "categoria": "NOVELA" },
@@ -77,6 +78,7 @@
   { "nome": "MARIA DO BAIRRO", "categoria": "NOVELA" },
   { "nome": "O CRAVO E A ROSA", "categoria": "NOVELA" },
   { "nome": "NOVA RAINHA", "categoria": "NOVELA" },
+  { "nome": "A FEIA MAIS BELA", "categoria": "NOVELA" },
 
   { "nome": "ALTAS HORAS", "categoria": "PROGRAMA DE TV" },
   { "nome": "BOM DIA E CIA", "categoria": "PROGRAMA DE TV" },
@@ -580,7 +582,7 @@
   { "nome": "MUSICA", "categoria": "MATERIA ESCOLAR" },
   { "nome": "LITERATURA", "categoria": "MATERIA ESCOLAR" },
   { "nome": "GRAMATICA", "categoria": "MATERIA ESCOLAR" },
-  { "nome": "REDAÇÃO", "categoria": "MATERIA ESCOLAR" },
+  { "nome": "REDACAO", "categoria": "MATERIA ESCOLAR" },
   { "nome": "ESTUDOS SOCIAIS", "categoria": "MATERIA ESCOLAR" },
   { "nome": "INFORMATICA", "categoria": "MATERIA ESCOLAR" },
 
@@ -613,7 +615,7 @@
   { "nome": "FACEBOOK", "categoria": "EMPRESA" },
   { "nome": "TESLA", "categoria": "EMPRESA" },
   { "nome": "NIKE", "categoria": "EMPRESA" },
-  { "nome": "COCA-COLA", "categoria": "EMPRESA" },
+  { "nome": "COCA COLA", "categoria": "EMPRESA" },
   { "nome": "SAMSUNG", "categoria": "EMPRESA" },
   { "nome": "TOYOTA", "categoria": "EMPRESA" },
   { "nome": "DISNEY", "categoria": "EMPRESA" },
