@@ -127,7 +127,9 @@ async function comparaListas(letra) {
       palavraSecretaCategoria === "NOME DE PESSOA" ||
       palavraSecretaCategoria === "TIME DE FUTEBOL" ||
       palavraSecretaCategoria === "NOVELA" ||
-      palavraSecretaCategoria === "JOGADOR"
+      palavraSecretaCategoria === "JOGADOR" ||
+      palavraSecretaCategoria === "PROGRAMA DE TV" ||
+      palavraSecretaCategoria === "DESENHO ANIMADO"
         ? 10
         : 5;
     pontuacaoUsuario += categoriaPontuacao;
