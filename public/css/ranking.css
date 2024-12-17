@@ -43,38 +43,33 @@ h1 {
 h1 i {
   color: #dbd803;
 }
+.table-container {
+  max-height: 300px; /* Limita a altura */
+  overflow-y: auto; /* Adiciona scroll vertical se necessário */
+  margin: 20px auto; /* Centraliza horizontalmente */
+}
 
 .table {
   width: 100%;
-  margin: 0 auto;
-  margin-top: 20px;
-  border-collapse: collapse;
-  max-height: 300px;
-  overflow-y: auto;
-  display: flex;
-  justify-content: center;
+  border-collapse: collapse; /* Junta as bordas */
 }
 
 .table th,
 .table td {
-  text-align: center;
+  text-align: center; /* Centraliza o conteúdo */
   padding: 10px;
-  border: 1px solid #dee2e6;
+  border: 1px solid #dee2e6; /* Adiciona borda */
 }
 
 .table td {
-  font-weight: 700;
+  font-weight: 700; /* Deixa os valores em negrito */
 }
 
 .table th {
-  background-color: #8b008b;
-  text-transform: uppercase;
-  font-weight: 700;
-  color: #fff;
-}
-
-.table tr:nth-child(even) {
-  background-color: #f2f2f2;
+  background-color: #8b008b; /* Fundo roxo */
+  text-transform: uppercase; /* Deixa o texto em maiúsculas */
+  font-weight: 700; /* Negrito */
+  color: #fff; /* Texto branco */
 }
 
 .btn {
