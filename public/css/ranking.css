@@ -51,7 +51,8 @@ h1 i {
   border-collapse: collapse;
   max-height: 300px;
   overflow-y: auto;
-  display: block;
+  display: flex;
+  justify-content: center;
 }
 
 .table th,
