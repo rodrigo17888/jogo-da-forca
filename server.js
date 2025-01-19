@@ -123,15 +123,3 @@ app.post("/atualizar-pontuacao", (req, res) => {
     });
   });
 });
-
-const cron = require("node-cron");
-
-// Executa uma consulta simples a cada hora
-cron.schedule("0 * * * *", async () => {
-  try {
-    await client.query("SELECT 1");
-    console.log("Conexão com o banco mantida ativa.");
-  } catch (error) {
-    console.error("Erro ao manter conexão ativa:", error);
-  }
-});
